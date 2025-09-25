@@ -39,13 +39,15 @@ if (!isset($_SESSION['csrf_token'])) {
         .btn-excluir { background-color: #dc3545; }
         .btn-voltar { background-color: #6c757d; margin-top: 20px; display: inline-block; padding: 10px 20px; color: white; text-decoration: none; border-radius: 6px; }
         .btn-voltar:hover { color: white; background-color: #5a6268; }
-        .btn-row { padding: 5px 10px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; color: white; font-size: 0.9rem; transition: background-color 0.2s; }
+        .btn-row { padding: 5px 10px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; color: white; font-size: 0.9rem; transition: background-color 0.2s; display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 35px; }
         .btn-row.editar { background-color: #28a745; }
         .btn-row.editar:hover { background-color: #218838; }
         .btn-row.excluir { background-color: #dc3545; }
         .btn-row.excluir:hover { background-color: #c82333; }
         /* Estilo para linha de "no data" na tabela */
         .no-data-row td { text-align: center; font-style: italic; color: #666; padding: 50px; }
+        .btn-row i { font-size: 1rem; margin: 0; }
+        .actions-column { width: 100px; text-align: center; }
     </style>
 </head>
 <body>
@@ -66,7 +68,7 @@ if (!isset($_SESSION['csrf_token'])) {
                     <th>ESTADO</th>
                     <th>COMPLEMENTO</th>
                     <th>N°</th>
-                    <th class="funcionalidades-header">FUNCIONALIDADES</th>
+                    <th class="funcionalidades-header actions-column">FUNCIONALIDADES</th>
                 </tr>
             </thead>
             <tbody id="tbody">
@@ -92,9 +94,9 @@ if (!isset($_SESSION['csrf_token'])) {
                         echo "<td>" . htmlspecialchars($row["complemento"]) . "</td>";
                         echo "<td>" . htmlspecialchars($row["numero"]) . "</td>";
                         echo "<td>";
-                        // Botões SEM onclick (usaremos event delegation). Adicione data-id para consistência
-                        echo '<button class="btn-row editar" data-id="' . $row["id"] . '" data-nome="' . htmlspecialchars($row["nome_completo"]) . '">Editar</button> ';
-                        echo '<button class="btn-row excluir" data-id="' . $row["id"] . '">Excluir</button>';
+                        // Botões COM ÍCONES DO BOOTSTRAP (adicionados sem alterar o resto do código)
+                        echo '<button class="btn-row editar" data-id="' . $row["id"] . '" data-nome="' . htmlspecialchars($row["nome_completo"]) . '" title="Editar"><i class="bi bi-pencil"></i></button> ';
+                        echo '<button class="btn-row excluir" data-id="' . $row["id"] . '" title="Excluir"><i class="bi bi-trash"></i></button>';
                         echo "</td>";
                         echo "</tr>";
                     }
@@ -113,147 +115,121 @@ if (!isset($_SESSION['csrf_token'])) {
     </div>
 
     <script>
-    const csrfToken = '<?php echo $_SESSION["csrf_token"]; ?>';  // Gera no PHP e passa para JS
+const csrfToken = '<?php echo $_SESSION["csrf_token"]; ?>';  // Gera no PHP e passa para JS
 
-    // AJUSTE AQUI: Como excluir.php está na RAIZ e listagem.php em /rjz/, use '../excluir.php' para subir um nível
-    const urlExcluir = '../excluir.php';  // <-- Isso resolve o 404. Se a subpasta for mais profunda, use '../../excluir.php'
+// CORRIGIDO: Path para excluir.php na raiz (sem '../' se listagem na raiz)
+const urlExcluir = 'excluir.php';  // <-- AJUSTE: Se excluir.php estiver em /assets/, mude para 'assets/excluir.php'
 
-    // Função para excluir um registro específico (chamada pelo event listener)
-    function excluirRegistro(id) {
-        if (!confirm('Deseja excluir este registro? Esta ação não pode ser desfeita.')) {
-            return;
-        }
-
-        // Debug: Log no console (veja no F12 > Console para diagnosticar)
-        console.log('=== DEBUG EXCLUSÃO ===');
-        console.log('ID do registro:', id);
-        console.log('URL da requisição:', urlExcluir);
-        console.log('URL base da página:', window.location.href);
-        console.log('CSRF Token:', csrfToken ? 'OK (presente)' : 'ERRO - Token vazio!');
-
-        // Crie dados para POST (use URLSearchParams para simplicidade)
-        const data = new URLSearchParams();
-        data.append('id', id);
-        data.append('csrf_token', csrfToken);
-
-        // Envie AJAX para excluir.php
-        fetch(urlExcluir, {
-            method: 'POST',
-            body: data,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',  // Para URLSearchParams
-            }
-        })
-        .then(response => {
-            // Debug: Log da resposta HTTP
-            console.log('Status HTTP recebido:', response.status);
-            console.log('Resposta OK?', response.ok);
-            console.log('Content-Type da resposta:', response.headers.get('Content-Type'));  // Deve ser 'application/json'
-
-            if (!response.ok) {
-                // Se erro HTTP (ex.: 404, 403, 500), pegue o texto para ver o erro exato (HTML ou JSON)
-                return response.text().then(text => {
-                    console.error('Resposta de erro completa (pode ser HTML de PHP):', text);  // <-- AQUI VOCÊ VE O ERRO EXATO!
-                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}\n\nConteúdo da resposta (primeiros 300 chars):\n${text.substring(0, 300)}...`);
-                });
-            }
-
-            // Se OK, tente parsear como JSON. Se falhar (ex.: HTML de erro), pegue o texto
-            return response.text().then(text => {
-                if (text.trim().startsWith('{')) {  // Verifica se parece JSON
-                    return JSON.parse(text);
-                } else {
-                    console.error('Resposta não é JSON válido (pode ser HTML de erro PHP):', text);
-                    throw new Error(`Resposta inválida (não é JSON):\n${text.substring(0, 300)}...`);
-                }
-            });
-        })
-        .then(data => {
-            // Se chegou aqui, data é o JSON parseado
-            console.log('Resposta JSON parseada com sucesso:', data);
-
-            if (data.success) {
-                // Remove a linha específica da tabela
-                const row = document.getElementById('row-' + id);
-                if (row) {
-                    row.remove();
-                    console.log('Linha removida do DOM (ID: row-' + id + ').');
-                } else {
-                    console.warn('Linha não encontrada no DOM (ID: row-' + id + ').');
-                }
-
-                // Verifica se a tabela ficou vazia e adiciona mensagem
-                const tbody = document.getElementById('tbody');
-                if (tbody && tbody.children.length === 0) {
-                    const noDataRow = document.createElement('tr');
-                    noDataRow.className = 'no-data-row';
-                    noDataRow.innerHTML = '<td colspan="12">Nenhum cadastro encontrado.</td>';
-                    tbody.appendChild(noDataRow);
-                    console.log('Adicionada linha de mensagem "no data" na tabela.');
-                }
-
-                alert(data.message || 'Registro excluído com sucesso!');
-                console.log('=== EXCLUSÃO BEM-SUCEDIDA ===');
-            } else {
-                console.error('Erro no backend (success: false):', data.message);
-                alert('Erro na exclusão: ' + (data.message || 'Falha desconhecida. Verifique o console.'));
-            }
-        })
-        .catch(error => {
-            console.error('Erro na requisição AJAX:', error);
-            alert('Erro de conexão ou processamento:\n\n' + error.message + '\n\nAbra F12 > Console para ver detalhes completos e o erro do servidor.');
-        });
+// Função para excluir um registro específico (chamada pelo event listener)
+function excluirRegistro(id) {
+    if (!confirm('Deseja excluir este registro? Esta ação não pode ser desfeita.')) {
+        return;
     }
 
-    // Event delegation: Um listener para todos os cliques na página (eficiente para botões dinâmicos)
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Página carregada. Event listeners adicionados.');  // Debug inicial
+    // Debug: Log no console
+    console.log('=== DEBUG EXCLUSÃO ===');
+    console.log('ID do registro:', id);
+    console.log('URL da requisição:', urlExcluir);
+    console.log('CSRF Token:', csrfToken ? 'OK' : 'ERRO - Token vazio!');
 
-        document.addEventListener('click', function(e) {
-            // Ação Excluir: Verifica se o alvo é um botão .excluir
-            if (e.target.matches('.excluir')) {
-                const id = e.target.getAttribute('data-id');
-                if (id) {
-                    console.log('Botão Excluir clicado para ID:', id);  // Debug
-                    excluirRegistro(id);  // Chama a função com o ID específico
-                } else {
-                    console.error('Botão Excluir sem data-id!');
-                    alert('ID do registro não encontrado no botão.');
-                }
-                e.preventDefault();  // Evita comportamentos padrão do botão
-                return false;
-            }
+    // Crie dados para POST
+    const data = new URLSearchParams();
+    data.append('id', id);
+    data.append('csrf_token', csrfToken);
 
-            // Ação Editar: Redireciona para editar.php com ID
-            if (e.target.matches('.editar')) {
-                const id = e.target.getAttribute('data-id');
-                const nome = e.target.getAttribute('data-nome') || 'o registro';
-                if (confirm('Deseja editar ' + nome + '?') && id) {
-                    console.log('Redirecionando para editar.php?id=' + id);  // Debug
-                    window.location.href = 'editar.php?id=' + encodeURIComponent(id);
-                }
-                e.preventDefault();
-                return false;
+    // Envie AJAX para excluir.php
+    fetch(urlExcluir, {
+        method: 'POST',
+        body: data,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => {
+        console.log('Status HTTP:', response.status);  // Debug
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error('Erro na resposta:', text);
+                throw new Error('Erro HTTP ' + response.status + ': ' + text.substring(0, 100));
+            });
+        }
+        return response.json();  // Assuma que excluir.php retorna JSON {success: true, message: '...'}
+    })
+    .then(data => {
+        console.log('Resposta JSON:', data);
+        if (data && data.success) {
+            // Remove a linha da tabela
+            const row = document.getElementById('row-' + id);
+            if (row) {
+                row.remove();
+                console.log('Linha removida (ID: ' + id + ')');
             }
-        });
-
-        // Inicializa "no data" se a tabela estiver vazia (para casos iniciais)
-        const tbody = document.getElementById('tbody');
-        const noDataDiv = document.getElementById('no-data');
-        const tabela = document.getElementById('tabela-dados');
-        if (tbody && tbody.children.length === 0) {
-            if (noDataDiv) {
-                noDataDiv.style.display = 'block';
+            // Se tabela vazia, adicione mensagem
+            const tbody = document.getElementById('tbody');
+            if (tbody && tbody.children.length === 0) {
+                tbody.innerHTML = '<tr class="no-data-row"><td colspan="12">Nenhum cadastro encontrado.</td></tr>';
             }
-            if (tabela) {
-                tabela.style.display = 'none';  // Opcional: esconde tabela vazia
-            }
-            console.log('Tabela vazia: Mensagem "no data" ativada.');
+            alert(data.message || 'Registro excluído com sucesso!');
         } else {
-            if (noDataDiv) {
-                noDataDiv.style.display = 'none';
+            alert('Erro na exclusão: ' + (data ? data.message : 'Falha desconhecida'));
+        }
+    })
+    .catch(error => {
+        console.error('Erro no fetch:', error);
+        alert('Erro de conexão: ' + error.message + '\nVerifique o console (F12).');
+    });
+}
+
+// Event delegation para cliques (eficiente)
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Página carregada. Aguardando cliques...');  // Debug inicial
+
+    document.addEventListener('click', function(e) {
+        // Debug: Log todo clique em botão (para testar se detecta)
+        if (e.target.closest('.btn-row')) {
+            console.log('Clique detectado em botão:', e.target.className, 'ID:', e.target.getAttribute('data-id'));
+        }
+
+        // Ação Excluir
+        if (e.target.matches('.excluir') || e.target.closest('.excluir')) {
+            const button = e.target.matches('.excluir') ? e.target : e.target.closest('.excluir');
+            const id = button.getAttribute('data-id');
+            console.log('Botão Excluir clicado, ID:', id);  // Debug
+            if (id) {
+                excluirRegistro(id);
+            } else {
+                console.error('Sem data-id no botão excluir!');
+                alert('Erro: ID não encontrado.');
             }
-            console.log('Tabela com dados: Mensagem "no data" escondida.');
+            e.preventDefault();
+            return false;
+        }
+
+        // Ação Editar: CORRIGIDO - Path relativo à raiz para /assets/
+        if (e.target.matches('.editar') || e.target.closest('.editar')) {
+            const button = e.target.matches('.editar') ? e.target : e.target.closest('.editar');
+            const id = button.getAttribute('data-id');
+            const nome = button.getAttribute('data-nome') || 'o registro';
+            console.log('Botão Editar clicado, ID:', id, 'Nome:', nome);  // Debug
+            if (confirm('Deseja editar ' + nome + '?') && id) {
+                const urlEditar = 'assets/editar.php?id=' + encodeURIComponent(id);  // Path corrigido para /assets/
+                console.log('Redirecionando para:', urlEditar);  // Debug
+                window.location.href = urlEditar;
+            }
+            e.preventDefault();
+            return false;
         }
     });
+
+    // Inicializa "no data" se vazio
+    const tbody = document.getElementById('tbody');
+    const noDataDiv = document.getElementById('no-data');
+    if (tbody && tbody.children.length === 0) {
+        noDataDiv.style.display = 'block';
+    } else {
+        noDataDiv.style.display = 'none';
+    }
+});
 </script>
+
+
