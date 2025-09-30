@@ -111,7 +111,7 @@ if (!isset($_SESSION['csrf_token'])) {
         </table>
         
         <!-- Botão para voltar -->
-        <a href="index.php" class="btn-voltar">Voltar ao Início</a>
+        <a href="inicial.php" class="btn-voltar">Voltar ao Início</a>
     </div>
 
     <script>

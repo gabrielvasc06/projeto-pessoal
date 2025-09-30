@@ -1,71 +1,144 @@
+<?php
+session_start();
+
+// Conexão com o banco
+$host = "localhost";
+$user = "root";
+$password = "root";
+$port = 8889;
+$dbname  = "check";
+
+$conn = new mysqli($host, $user, $password, $dbname, $port);
+if ($conn->connect_error) {
+    die("Erro na conexão: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // LOGIN
+    if (isset($_POST["login"])) {
+        $email = trim($_POST["email"]);
+        $senha = trim($_POST["senha"]);
+
+        $sql = "SELECT * FROM usuarios WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            $usuario = $result->fetch_assoc();
+
+            if (password_verify($senha, $usuario["senha"])) {
+                $_SESSION["usuario"] = $usuario["nome"];
+                header("Location: inicial.php");
+                exit();
+            } else {
+                $erro = "Senha incorreta.";
+            }
+        } else {
+            $erro = "Usuário não encontrado.";
+        }
+    }
+
+    // CADASTRO
+    if (isset($_POST["cadastro"])) {
+        $nome = trim($_POST["nome"]);
+        $email = trim($_POST["email"]);
+        $senha = password_hash(trim($_POST["senha"]), PASSWORD_DEFAULT);
+
+        // Verificar se já existe usuário
+        $check = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+        $check->bind_param("s", $email);
+        $check->execute();
+        $res = $check->get_result();
+
+        if ($res->num_rows > 0) {
+            $erro = "Já existe uma conta com esse e-mail.";
+        } else {
+            $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sss", $nome, $email, $senha);
+
+            if ($stmt->execute()) {
+                $sucesso = "Usuário cadastrado com sucesso! Agora faça login.";
+            } else {
+                $erro = "Erro ao cadastrar. Tente novamente.";
+            }
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> LOGIN - SYSTEM </title>
-    <!-- BOOTSTRAP ICONS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <!-- BOOSTRAP CSS, JS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
-        </script>
-        <style>
-        body {
-            background-color: black;
-            color: white
-        }
-        body{
-             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100px;
-            margin: 300px;
-
-        }
-
-     .card-body {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      align-items: center; 
-
-     }  
-        .text-font{
-    
-            
-        }
-  
- 
-    </style>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<body class="bg-dark text-light d-flex justify-content-center align-items-center vh-100">
 
-<body>
+<div class="card shadow p-4" style="width: 28rem;">
+    <h2 class="text-center mb-3">Sistema de Cadastro</h2>
 
-    <main>
-       <div class="card" style="width: 21.5rem;">
-  <div class="card-body">
-    <h2 class="card-title mb-1" style="height: 75px; text-align: center"> <i> SISTEMA DE CADASTRO </i></h2>
-     <i class="bi bi-file-earmark-plus" style="font-size: 60px;"></i>
+    <?php if (!empty($erro)): ?>
+        <div class="alert alert-danger"><?= $erro ?></div>
+    <?php endif; ?>
 
-        <div class="text-font">
-            <i>
-            <br> <strong> Rapido, seguro e intuitivo. </strong>
-            </i>
+    <?php if (!empty($sucesso)): ?>
+        <div class="alert alert-success"><?= $sucesso ?></div>
+    <?php endif; ?>
+
+    <!-- Abas -->
+    <ul class="nav nav-tabs" id="tabForm" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login"
+                    type="button" role="tab">Login</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro"
+                    type="button" role="tab">Cadastro</button>
+        </li>
+    </ul>
+
+    <!-- Conteúdo das abas -->
+    <div class="tab-content mt-3">
+        <!-- Form Login -->
+        <div class="tab-pane fade show active" id="login" role="tabpanel">
+            <form method="post">
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Senha</label>
+                    <input type="password" name="senha" class="form-control" required>
+                </div>
+                <button type="submit" name="login" class="btn btn-primary w-100">Entrar</button>
+            </form>
         </div>
-        <a href="cadastro.php" class="btn border border-info btn btn-primary text-light card-body d-flex flex-column align-items-center" style="width: 200px; padding: 3px; margin-top: 1rem;"> <i class="bi bi-box-arrow-right"> <strong> CADASTRAR </strong></i></a>
 
-        <a href="listagem.php" class="btn border border-info btn btn-primary text-light  card-body d-flex flex-column align-items-center mb-3 " style="width: 200px; padding: 3px; margin-top: 0.6rem; "> <i class="bi bi-person-gear"> <strong> LISTAR </strong> </i></a>
-         </div>
-             </div>
-               </div>
-                    </div>
+        <!-- Form Cadastro -->
+        <div class="tab-pane fade" id="cadastro" role="tabpanel">
+            <form method="post">
+                <div class="mb-3">
+                    <label>Nome</label>
+                    <input type="text" name="nome" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Senha</label>
+                    <input type="password" name="senha" class="form-control" required>
+                </div>
+                <button type="submit" name="cadastro" class="btn btn-success w-100">Cadastrar</button>
+            </form>
+        </div>
+    </div>
+</div>
 
-    </main>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

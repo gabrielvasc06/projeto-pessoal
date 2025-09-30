@@ -178,7 +178,7 @@ h2 {
 
             </div>
             <div class="button-group">
-                <a class="btn-back" href="index.php" style="width: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; padding: 11px; border-radius: 20px; background-color: #000000ff; color: #fff;"> Voltar </a>
+                <a class="btn-back" href="inicial.php" style="width: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; padding: 5px; border-radius: 20px; background-color: #000000ff; color: #fff;"> Voltar </a>
                 <button type="submit" class="btn-submit"> Enviar </button>
             </div>
         </form>
