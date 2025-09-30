@@ -78,8 +78,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body class="bg-dark text-light d-flex justify-content-center align-items-center vh-100">
 
-<div class="card shadow p-4" style="width: 28rem;">
-    <h2 class="text-center mb-3">Sistema de Cadastro</h2>
+<div class="card shadow p-4" style="width: 25rem; height: 27rem; ">
+    <h2 class="text-center mb-3 ">Sistema de Cadastro</h2>
 
     <?php if (!empty($erro)): ?>
         <div class="alert alert-danger"><?= $erro ?></div>
@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <ul class="nav nav-tabs" id="tabForm" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login"
-                    type="button" role="tab">Login</button>
+                    type="button" role="tab"> <strong> Login </strong></button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro"
@@ -107,14 +107,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="tab-pane fade show active" id="login" role="tabpanel">
             <form method="post">
                 <div class="mb-3">
-                    <label>Email</label>
+                    <label> <strong> Email </strong></label>
                     <input type="email" name="email" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label>Senha</label>
+                    <label> <strong> Senha </strong></label>
                     <input type="password" name="senha" class="form-control" required>
                 </div>
-                <button type="submit" name="login" class="btn btn-primary w-100">Entrar</button>
+                <button type="submit" name="login" class="btn btn-black border border-success w-100 "> Entrar </button>
             </form>
         </div>
 
