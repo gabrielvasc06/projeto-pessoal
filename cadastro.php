@@ -171,7 +171,7 @@ h2 {
             <div class="form-group">
                 <label style="display: flex; align-items: center; gap: 8px;">
                 <span style="white-space: nowrap;">
-                Aceito os <a href="#">termos</a> <input type="checkbox" style="width: 20px"; >
+                Aceito os <a href="termos.html">termos</a> <input type="checkbox" style="width: 20px"; >
                 </span>
                 </label>
 

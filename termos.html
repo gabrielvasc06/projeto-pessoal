@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LGPD — Glossário de Termos</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #0b1220;
+      --accent: #10b981;
+      --muted: #94a3b8;
+      --glass: rgba(255,255,255,0.03);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial;
+      margin: 0;
+      background: linear-gradient(180deg,#07102a 0%, #071029 100%);
+      color: #e6eef8;
+    }
+
+    header {
+      padding: 28px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 28px;
+      padding: 0 24px 48px;
+    }
+
+    nav {
+      position: sticky;
+      top: 20px;
+      align-self: start;
+      background: var(--card);
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    }
+
+    .search {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .search input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.04);
+      background: var(--glass);
+      color: inherit;
+    }
+
+    .term-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .term-list a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .term-list a:hover {
+      background: rgba(255,255,255,0.02);
+      border-color: rgba(255,255,255,0.03);
+    }
+
+    main {
+      padding: 18px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+
+    section {
+      padding: 22px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    }
+
+    section h2 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .top-actions {
+      margin-left: auto;
+    }
+
+    .button {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    footer {
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 880px) {
+      .container {
+        grid-template-columns: 1fr;
+        padding: 0 16px;
+      }
+
+      nav {
+        position: relative;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Glossário LGPD — Termos essenciais</h1>
+      <div class="meta">Clique num termo para ir diretamente à definição na página.</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <nav aria-label="Lista de termos">
+      <div class="search">
+        <input id="filtro" placeholder="Filtrar termos..." aria-label="Filtrar termos" />
+        <button class="button" onclick="clearFilter()">Limpar</button>
+      </div>
+
+      <ul class="term-list" id="termList">
+        <li><a href="#dados-pessoais">Dados Pessoais</a></li>
+        <li><a href="#dados-pessoais-sensiveis">Dados Pessoais Sensíveis</a></li>
+        <li><a href="#titular">Titular</a></li>
+        <li><a href="#controlador">Controlador</a></li>
+        <li><a href="#operador">Operador</a></li>
+        <li><a href="#tratamento">Tratamento</a></li>
+        <li><a href="#consentimento">Consentimento</a></li>
+        <li><a href="#anonimizacao">Anonimização</a></li>
+        <li><a href="#pseudonimizacao">Pseudonimização</a></li>
+        <li><a href="#encarregado">Encarregado (DPO)</a></li>
+        <li><a href="#finalidade">Finalidade</a></li>
+        <li><a href="#base-legal">Base Legal</a></li>
+        <li><a href="#transferencia-internacional">Transferência Internacional de Dados</a></li>
+        <li><a href="#portabilidade">Portabilidade</a></li>
+        <li><a href="#eliminacao">Eliminação</a></li>
+        <li><a href="#relatorio-impacto">Relatório de Impacto (DPIA)</a></li>
+      </ul>
+    </nav>
+
+    <main id="conteudo">
+      <section id="dados-pessoais">
+        <h2>Dados Pessoais</h2>
+        <p>Informação vinculada ou vinculável a uma pessoa natural identificada ou identificável (ex.: nome, CPF, e-mail, IP).</p>
+      </section>
+
+      <section id="dados-pessoais-sensiveis">
+        <h2>Dados Pessoais Sensíveis</h2>
+        <p>Dados sobre origem racial/étnica, convicção religiosa, opinião política, saúde, vida sexual, genética, biometria, entre outros com maior risco ao titular.</p>
+      </section>
+
+      <section id="titular">
+        <h2>Titular</h2>
+        <p>Pessoa natural a quem se referem os dados pessoais.</p>
+      </section>
+
+      <section id="controlador">
+        <h2>Controlador</h2>
+        <p>Pessoa natural ou jurídica, de direito público ou privado, que toma decisões sobre o tratamento de dados (finalidade, meios, segurança).</p>
+      </section>
+
+      <section id="operador">
+        <h2>Operador</h2>
+        <p>Quem realiza o tratamento de dados pessoais em nome do controlador, seguindo suas instruções.</p>
+      </section>
+
+      <section id="tratamento">
+        <h2>Tratamento</h2>
+        <p>Qualquer operação realizada com dados pessoais: coleta, produção, recepção, classificação, utilização, reprodução, transmissão, disseminação, arquivamento, armazenamento, eliminação etc.</p>
+      </section>
+
+      <section id="consentimento">
+        <h2>Consentimento</h2>
+        <p>Manifestação livre, informada e inequívoca pela qual o titular concorda com o tratamento de seus dados para finalidades específicas.</p>
+      </section>
+
+      <section id="anonimizacao">
+        <h2>Anonimização</h2>
+        <p>Processo que torna impossível identificar o titular, tornando os dados excluídos da aplicação da LGPD quando irreversíveis.</p>
+      </section>
+
+      <section id="pseudonimizacao">
+        <h2>Pseudonimização</h2>
+        <p>Substituição de um identificador por outro, reduzindo a ligação direta com o titular, porém mantendo possibilidade de reidentificação com informações adicionais.</p>
+      </section>
+
+      <section id="encarregado">
+        <h2>Encarregado (DPO)</h2>
+        <p>Profissional indicado pelo controlador para atuar como canal de comunicação entre titular, controlador e ANPD e orientar sobre boas práticas de proteção de dados.</p>
+      </section>
+
+      <section id="finalidade">
+        <h2>Finalidade</h2>
+        <p>Motivo legítimo e explícito pelo qual os dados pessoais são coletados e tratados.</p>
+      </section>
+
+      <section id="base-legal">
+        <h2>Base Legal</h2>
+        <p>Fundamento jurídico que autoriza o tratamento (ex.: consentimento, cumprimento de obrigação legal, execução de contrato, legítimo interesse, proteção da vida, tutela da saúde, exercício regular de direitos).</p>
+      </section>
+
+      <section id="transferencia-internacional">
+        <h2>Transferência Internacional de Dados</h2>
+        <p>Transmissão de dados pessoais do Brasil para outro país. Deve observar mecanismos que garantam nível de proteção compatível com a LGPD.</p>
+      </section>
+
+      <section id="portabilidade">
+        <h2>Portabilidade</h2>
+        <p>Direito do titular de receber seus dados pessoais tratados por um controlador e transferi-los a outro, quando tecnicamente viável.</p>
+      </section>
+
+      <section id="eliminacao">
+        <h2>Eliminação</h2>
+        <p>Exclusão dos dados pessoais quando não houver necessidade legal ou contratual para mantê-los ou quando requerido pelo titular, observadas exceções legais.</p>
+      </section>
+
+      <section id="relatorio-impacto">
+        <h2>Relatório de Impacto à Proteção de Dados (DPIA)</h2>
+        <p>Documento que avalia riscos ao titular decorrentes do tratamento de dados e as medidas adotadas para mitigá-los — recomendado para operações de alto risco.</p>
+      </section>
+
+      <footer>
+        <p>Baseado nos conceitos da Lei nº 13.709/2018 (LGPD). Use a busca acima para filtrar termos; clique em qualquer termo na lista à esquerda para ir direto à seção.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        const id = this.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          window.location.hash = id;
+        }
+      });
+    });
+
+    // Simple filter for left list
+    const filtro = document.getElementById('filtro');
+    const termList = document.getElementById('termList');
+    filtro.addEventListener('input', () => {
+      const q = filtro.value.toLowerCase();
+      [...termList.querySelectorAll('li')].forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(q) ? 'block' : 'none';
+      });
+    });
+
+    function clearFilter() {
+      filtro.value = '';
+      filtro.dispatchEvent(new Event('input'));
+      filtro.focus();
+    }
+  </script>
+</body>
+</html>
